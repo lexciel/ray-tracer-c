@@ -1,0 +1,20 @@
+# Prerequisites
+*.d
+
+# Object files
+*.o
+*.obj
+
+# Executables (Add the specific name of your output binary if different)
+main
+main.exe
+a.out
+
+# Output Images (Common in ray tracing)
+*.ppm
+*.png
+*.jpg
+
+# Editor/OS files
+.DS_Store
+.vscode/
