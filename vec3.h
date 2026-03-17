@@ -63,20 +63,20 @@ static inline vec3 vec3_cross(vec3 a, vec3 b) {
 void vec3_print(FILE *out, vec3 a);
 
 
-vec3 vec3_random();
-vec3 vec3_random_interval(interval val); 
+vec3 vec3_random(pcg32_random_t *rng);
+vec3 vec3_random_interval(interval val, pcg32_random_t *rng); 
 
-static inline vec3 vec3_random_unit_vector() {
+static inline vec3 vec3_random_unit_vector(pcg32_random_t *rng) {
     while (1) {
-        vec3 p = vec3_random_interval((interval){-1, 1});
+        vec3 p = vec3_random_interval((interval){-1, 1}, rng);
         scalar lensq = vec3_length_squared(p);
         if (VEC3_EPSILON < lensq && lensq <= 1)
             return vec3_scale(p , 1.0 / sqrt(lensq));
     }
 }
 
-static inline vec3 vec3_random_on_hemisphere(vec3 normal) {
-    vec3 on_unit_sphere = vec3_random_unit_vector();
+static inline vec3 vec3_random_on_hemisphere(vec3 normal, pcg32_random_t *rng) {
+    vec3 on_unit_sphere = vec3_random_unit_vector(rng);
     if (vec3_dot(on_unit_sphere, normal) > 0.0) // In the same hemisphere as the normal
         return on_unit_sphere;
     else
@@ -99,9 +99,9 @@ static inline vec3 vec3_refract(const vec3 uv, const vec3 n, scalar etai_over_et
     return vec3_add(r_out_perp , r_out_parallel);
 }
 
-static inline vec3 vec3_random_in_unit_disk() {
+static inline vec3 vec3_random_in_unit_disk(pcg32_random_t *rng) {
     while(1) {
-        vec3 p = {random_double_range(-1, 1), random_double_range(-1, 1), 0};
+        vec3 p = {random_double_range(-1, 1, rng), random_double_range(-1, 1, rng), 0};
         if (vec3_length_squared(p) < 1) {
             return p;
         }

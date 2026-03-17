@@ -1,8 +1,10 @@
+#include "hittable.h"
 #include "hittable_list.h"
 #include "interval.h"
 #include "sphere.h"
 #include "camera.h"
 #include "material.h"
+#include "utility.h"
 #include "vec3.h"
 
 int main() {
@@ -48,18 +50,19 @@ int main() {
     vec3_print(stderr, vec3_cross(v, w));
     */
 
-    material *ground_mat = make_lambertian(&world_mem, (colour){0.5, 0.5, 0.5});
+    material *ground_mat = (material*) make_lambertian(&world_mem, (colour){0.5, 0.5, 0.5});
     hitlist_add(world, (hittable*)make_sphere(&world_mem, (point3){0,-1000,0}, 1000, ground_mat));
-
+    pcg32_random_t rng;
+    pcg32_seed(&rng, 42, 0);
 
     for (int a = -11; a < 11; a++) {
         for (int b = -11; b < 11; b++) {
-            double choose_mat = random_double();
+            double choose_mat = random_double(&rng);
             
             point3 center = {
-                a + 0.9 * random_double(),
+                a + 0.9 * random_double(&rng),
                 0.2,
-                b + 0.9 * random_double()
+                b + 0.9 * random_double(&rng)
             };
 
             // Check distance to ensure we don't overlap the big spheres
@@ -68,22 +71,22 @@ int main() {
 
                 if (choose_mat < 0.8) {
                     // Diffuse (Lambertian)
-                    colour albedo = vec3_mult(vec3_random(), vec3_random());
-                    sphere_mat = make_lambertian(&world_mem, albedo);
+                    colour albedo = vec3_mult(vec3_random(&rng), vec3_random(&rng));
+                    sphere_mat = (material*) make_lambertian(&world_mem, albedo);
                     
                     hitlist_add(world, (hittable*)make_sphere(&world_mem, center, 0.2, sphere_mat));
                     
                 } else if (choose_mat < 0.95) {
                     // Metal
-                    colour albedo = vec3_random_interval((interval){0.5, 1});
-                    double fuzz = random_double_range(0, 0.5);
-                    sphere_mat = make_metal(&world_mem, albedo, fuzz);
+                    colour albedo = vec3_random_interval((interval){0.5, 1}, &rng);
+                    double fuzz = random_double_range(0, 0.5, &rng);
+                    sphere_mat = (material*) make_metal(&world_mem, albedo, fuzz);
                     
                     hitlist_add(world, (hittable*)make_sphere(&world_mem, center, 0.2, sphere_mat));
                     
                 } else {
                     // Glass (Dielectric)
-                    sphere_mat = make_dialectric(&world_mem, 1.5);
+                    sphere_mat = (material*) make_dialectric(&world_mem, 1.5);
                     hitlist_add(world, (hittable*)make_sphere(&world_mem, center, 0.2, sphere_mat));
                 }
             }
@@ -91,13 +94,13 @@ int main() {
     }
 
 
-    material *mat1 = make_dialectric(&world_mem, 1.5);
+    material *mat1 = (material*) make_dialectric(&world_mem, 1.5);
     hitlist_add(world, (hittable*)make_sphere(&world_mem, (point3){0, 1, 0}, 1.0, mat1));
 
-    material *mat2 = make_lambertian(&world_mem, (colour){0.4, 0.2, 0.1});
+    material *mat2 = (material*) make_lambertian(&world_mem, (colour){0.4, 0.2, 0.1});
     hitlist_add(world, (hittable*)make_sphere(&world_mem, (point3){-4, 1, 0}, 1.0, mat2));
 
-    material *mat3 = make_metal(&world_mem, (colour){0.7, 0.6, 0.5}, 0.0);
+    material *mat3 = (material*) make_metal(&world_mem, (colour){0.7, 0.6, 0.5}, 0.0);
     hitlist_add(world, (hittable*)make_sphere(&world_mem, (point3){4, 1, 0}, 1.0, mat3));
 
     scalar aspect_ratio = 16.0/9.0;
@@ -119,7 +122,7 @@ int main() {
     cam.defocus_angle = 0.6;
     cam.focus_dist    = 10;
 
-    render(&cam, world);
+    render(&cam, world, &rng);
     arena_free(&world_mem);
 }
 

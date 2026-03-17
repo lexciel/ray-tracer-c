@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define ALIGNMENT 16
+#define ALIGNMENT 64
 
 typedef struct {
     unsigned char *buffer;

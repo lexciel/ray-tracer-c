@@ -60,7 +60,7 @@ void camera_init(camera* orig_cam) {
     *orig_cam = temp_cam;
 }
 
-void render(camera *cam, hittable_list *world) {
+void render(camera *cam, hittable_list *world, pcg32_random_t *rng) {
 
     camera_init(cam);
 
@@ -77,8 +77,8 @@ void render(camera *cam, hittable_list *world) {
             colour pixel_colour = {0,0,0};
             vec3 pixel_centre = vec3_add(row_start, vec3_scale(cam->pixel_delta_x, j));
             for (int sample = 0; sample < cam->samples_per_pixel; sample++) {
-                ray r = get_ray(cam, pixel_centre);
-                pixel_colour = vec3_add(pixel_colour, ray_colour(&r, (hittable*) world, cam->max_depth));
+                ray r = get_ray(cam, pixel_centre, rng);
+                pixel_colour = vec3_add(pixel_colour, ray_colour(&r, (hittable*) world, cam->max_depth, rng));
             }
             colour_write(stdout, vec3_scale(pixel_colour,cam->pixel_samples_scale));
         }
@@ -86,7 +86,7 @@ void render(camera *cam, hittable_list *world) {
     
 }
 
-colour ray_colour(ray *r, const hittable *world, int depth) {
+colour ray_colour(ray *r, const hittable *world, int depth, pcg32_random_t *rng) {
 
     if (!depth) return black;
             
@@ -96,8 +96,8 @@ colour ray_colour(ray *r, const hittable *world, int depth) {
     if (world->hit(world, r, (interval){0.0001, infinity}, &rec)) {
         ray scattered;
         colour attentuation;
-        if (rec.mat->scatter(rec.mat, r, &rec, &attentuation, &scattered)) {
-            return vec3_mult(ray_colour(&scattered, world, depth-1), attentuation);
+        if (rec.mat->scatter(rec.mat, r, &rec, &attentuation, &scattered, rng)) {
+            return vec3_mult(ray_colour(&scattered, world, depth-1, rng), attentuation);
         }
         return black;
         /*vec3 direction = vec3_add(rec.normal, vec3_random_unit_vector());
@@ -120,11 +120,11 @@ colour ray_colour(ray *r, const hittable *world, int depth) {
     return (ray){ray_origin, ray_direction};
 }*/
 
-vec3 sample_square() {
-    return (vec3){random_double() - 0.5, random_double() - 0.5, 0};
+vec3 sample_square(pcg32_random_t *rng) {
+    return (vec3){random_double(rng) - 0.5, random_double(rng) - 0.5, 0};
 }
 
-point3 defocus_disk_sample(const camera *cam) {
-    vec3 p = vec3_random_in_unit_disk();
+point3 defocus_disk_sample(const camera *cam, pcg32_random_t *rng) {
+    vec3 p = vec3_random_in_unit_disk(rng);
     return vec3_add(cam->centre, vec3_add(vec3_scale(cam->defocus_disk_x, p.x), vec3_scale(cam->defocus_disk_y, p.y)));
 }

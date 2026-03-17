@@ -4,7 +4,7 @@
 #include "utility.h"
 #include "colour.h"
 
-typedef int (*scatter_fn)(const material* self, const ray *ray_in, const hit_record *rec, colour *attentuation, ray *scattered);
+typedef int (*scatter_fn)(const material* self, const ray *ray_in, const hit_record *rec, colour *attentuation, ray *scattered, pcg32_random_t *rng);
 
 struct material {
     scatter_fn scatter;
@@ -26,9 +26,9 @@ typedef struct {
     scalar refraction_index;
 } dialectric;
 
-int scatter_lambertian(const material* self, const ray *ray_in,const hit_record *rec, colour *attentuation, ray *scattered);
-int scatter_metal(const material* self, const ray *ray_in,const hit_record *rec, colour *attentuation, ray *scattered);
-int scatter_dialectric(const material* self, const ray *ray_in,const hit_record *rec, colour *attentuation, ray *scattered);
+int scatter_lambertian(const material* self, const ray *ray_in,const hit_record *rec, colour *attentuation, ray *scattered, pcg32_random_t *rng);
+int scatter_metal(const material* self, const ray *ray_in,const hit_record *rec, colour *attentuation, ray *scattered, pcg32_random_t *rng);
+int scatter_dialectric(const material* self, const ray *ray_in,const hit_record *rec, colour *attentuation, ray *scattered, pcg32_random_t *rng);
 
 lambertian* make_lambertian(arena* a, colour albedo);
 metal* make_metal(arena* a, colour albedo, scalar fuzz);

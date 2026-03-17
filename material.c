@@ -2,9 +2,9 @@
 #include "utility.h"
 #include "vec3.h"
 
-int scatter_lambertian(const material* self, const ray *ray_in, const hit_record *rec, colour *attentuation, ray *scattered) {
+int scatter_lambertian(const material* self, const ray *ray_in, const hit_record *rec, colour *attentuation, ray *scattered, pcg32_random_t *rng) {
     const lambertian *this = (lambertian*)self;
-    vec3 scatter_direction =  vec3_add(rec->normal, vec3_random_unit_vector());
+    vec3 scatter_direction =  vec3_add(rec->normal, vec3_random_unit_vector(rng));
 
     if (vec3_near_zero(scatter_direction)) scatter_direction = rec->normal;
 
@@ -13,16 +13,16 @@ int scatter_lambertian(const material* self, const ray *ray_in, const hit_record
     return 1;
 }
 
-int scatter_metal(const material* self, const ray *ray_in, const hit_record *rec, colour *attentuation, ray *scattered) {
+int scatter_metal(const material* self, const ray *ray_in, const hit_record *rec, colour *attentuation, ray *scattered, pcg32_random_t *rng) {
     const metal *this = (metal*)self;
     vec3 reflected = vec3_reflect(ray_in->dir, rec->normal);
-    reflected = vec3_add(vec3_unit(reflected), vec3_scale(vec3_random_unit_vector(), this->fuzz));
+    reflected = vec3_add(vec3_unit(reflected), vec3_scale(vec3_random_unit_vector(rng), this->fuzz));
     *scattered = (ray) {rec->p, reflected};
     *attentuation = this->albedo;
     return vec3_dot(scattered->dir, rec->normal) > 0;
 }
 
-int scatter_dialectric(const material* self, const ray *ray_in,const hit_record *rec, colour *attentuation, ray *scattered) {
+int scatter_dialectric(const material* self, const ray *ray_in,const hit_record *rec, colour *attentuation, ray *scattered, pcg32_random_t *rng) {
     const dialectric *this = (dialectric*)self;
     *attentuation = white;
     scalar ri = rec->front_face ? (1.0/this->refraction_index) : this->refraction_index;
@@ -33,7 +33,7 @@ int scatter_dialectric(const material* self, const ray *ray_in,const hit_record 
 
     int cannot_refract = ri * sin_theta > 1.0;
     vec3 direction;
-    if (cannot_refract || reflectance(cos_theta, ri) > random_double()) {
+    if (cannot_refract || reflectance(cos_theta, ri) > random_double(rng)) {
         direction = vec3_reflect(unit_direction, rec->normal);
     } else {
         direction = vec3_refract(unit_direction, rec->normal, ri);

@@ -20,17 +20,14 @@ extern const double pi;
 static inline double degrees_to_radians(double degrees) {
     return degrees * pi / 180.0;
 }
+typedef struct { uint64_t state;  uint64_t inc; } pcg32_random_t;
 
-static _Thread_local uint32_t my_seed = 0; 
-
-// 2. A fast, custom RNG (PCG Hash or Xorshift)
-// Don't use rand()!
-uint32_t pcg_hash(uint32_t input);
-
-double random_double();
+uint32_t pcg32_random_r(pcg32_random_t *rng);
+void pcg32_seed(pcg32_random_t *rng, uint64_t seed, uint64_t stream);
+double random_double(pcg32_random_t *rng);
 // Returns a random real in [min,max).
-static inline double random_double_range(double min, double max) {
-    return min + (max - min) * random_double();
+static inline double random_double_range(double min, double max, pcg32_random_t *rng) {
+    return min + (max - min) * random_double(rng);
 }
 
 
