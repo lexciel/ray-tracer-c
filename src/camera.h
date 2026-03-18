@@ -35,7 +35,7 @@ typedef struct {
 point3 defocus_disk_sample(const camera *cam, pcg32_random_t *rng);
 camera default_cam();
 void camera_init(camera* orig_cam);
-void render(camera *cam, hittable_list *world, pcg32_random_t *rng);
+void render(camera *cam, hittable_list *world, pcg32_random_t *rng, colour_buffer *buffer);
 colour ray_colour(ray *r, const hittable *world, int depth, pcg32_random_t *rng);
 vec3 sample_square(pcg32_random_t *rng);
 

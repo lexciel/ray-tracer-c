@@ -1,3 +1,5 @@
+#include "arena.h"
+#include "colour.h"
 #include "hittable.h"
 #include "hittable_list.h"
 #include "interval.h"
@@ -9,7 +11,7 @@
 
 int main() {
 
-    arena world_mem = arena_init(1024*1024);
+    arena world_mem = arena_init(1024*1024*32);
     /*lambertian *material_ground = make_lambertian(&world_mem, (colour){0.8, 0.8, 0});
     lambertian *material_center = make_lambertian(&world_mem, (colour){0.1, 0.2, 0.5});
     dialectric *material_left = make_dialectric(&world_mem, 1.50);
@@ -121,8 +123,13 @@ int main() {
     cam.vup      = (vec3){0,1,0};
     cam.defocus_angle = 0.6;
     cam.focus_dist    = 10;
-
-    render(&cam, world, &rng);
+    int image_height = (int) (image_width/aspect_ratio);
+    image_height = (image_height < 1) ? 1 : image_height;
+    colour_buffer *buffer = arena_alloc(&world_mem, sizeof(colour_buffer) + sizeof(uint8_t) *  image_height*image_width * 3);
+    buffer->height = image_height;
+    buffer->width = image_width;
+    buffer->buffer = (pixel*)((uint8_t*)buffer + sizeof(colour_buffer));
+    render(&cam, world, &rng, buffer);
     arena_free(&world_mem);
 }
 

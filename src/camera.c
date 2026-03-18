@@ -1,4 +1,5 @@
 #include "camera.h"
+#include "colour.h"
 #include "utility.h"
 #include "vec3.h"
 #include "material.h"
@@ -60,16 +61,20 @@ void camera_init(camera* orig_cam) {
     *orig_cam = temp_cam;
 }
 
-void render(camera *cam, hittable_list *world, pcg32_random_t *rng) {
+void render(camera *cam, hittable_list *world, pcg32_random_t *rng, colour_buffer *buffer) {
 
     camera_init(cam);
 
     printf("P3\n%d %d\n255\n", cam->image_width, cam->image_height);
 
+    #pragma omp parallel for
     for (int i =0; i<cam->image_height; i++) {
         fprintf(stderr, "\rScanlines remaining: %d", cam->image_height - i);
         vec3 row_start = vec3_add(cam->pixel00_loc, vec3_scale(cam->pixel_delta_y, i));
+        pcg32_random_t local_rand;
+        pcg32_seed(&local_rand, 42+i, i);
         for (int j = 0; j < cam->image_width; j++) {
+;
             /*point3 pixel_centre = vec3_add(cam->pixel00_loc, vec3_add(vec3_scale(cam->pixel_delta_x, (scalar)j), vec3_scale(cam->pixel_delta_y, (scalar)i)));
             vec3 ray_direction = vec3_sub(pixel_centre, cam->centre);
             ray r = {cam->centre, ray_direction};
@@ -77,12 +82,13 @@ void render(camera *cam, hittable_list *world, pcg32_random_t *rng) {
             colour pixel_colour = {0,0,0};
             vec3 pixel_centre = vec3_add(row_start, vec3_scale(cam->pixel_delta_x, j));
             for (int sample = 0; sample < cam->samples_per_pixel; sample++) {
-                ray r = get_ray(cam, pixel_centre, rng);
-                pixel_colour = vec3_add(pixel_colour, ray_colour(&r, (hittable*) world, cam->max_depth, rng));
+                ray r = get_ray(cam, pixel_centre, &local_rand);
+                pixel_colour = vec3_add(pixel_colour, ray_colour(&r, (hittable*) world, cam->max_depth, &local_rand));
             }
-            colour_write(stdout, vec3_scale(pixel_colour,cam->pixel_samples_scale));
+            colour_write(buffer, vec3_scale(pixel_colour,cam->pixel_samples_scale), &buffer->buffer[i*cam->image_width + j]);
         }
     }
+    colour_write_out(stdout, buffer);
     
 }
 
