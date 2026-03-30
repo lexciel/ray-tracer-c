@@ -3,14 +3,15 @@
 
 #include "hittable.h"
 
-
 typedef struct {
-    hittable base;
-    point3 centre;
-    scalar rad; //fmax(0, rad_input) when not using constructor
-    material *mat;
+  hittable base;
+  ray centre;
+  scalar rad; // fmax(0, rad_input) when not using constructor
+  material *mat;
 } sphere;
-
-int hit_sphere(const hittable *self, const ray *r, interval ray_t, hit_record *rec) ;
-sphere *make_sphere(arena *a, point3 c, scalar r, material *mat);
+extern const point3 static_sphere;
+int hit_sphere(const hittable *self, const ray *r, interval ray_t,
+               hit_record *rec);
+sphere *make_sphere(arena *a, point3 centre1, point3 centre2, scalar r,
+                    material *mat);
 #endif
