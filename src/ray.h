@@ -1,9 +1,9 @@
-#ifndef RAY_H
+sfifndef RAY_H
 #define RAY_H
 
 #include "vec3.h"
 
-typedef struct {
+    typedef struct {
   point3 orig;
   vec3 dir;
   scalar tm;

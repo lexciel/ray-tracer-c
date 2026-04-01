@@ -48,3 +48,7 @@ sphere *make_sphere(arena *a, point3 c1, point3 c2, scalar r, material *mat) {
   s->mat = mat;
   return s;
 }
+
+sphere *make_static_sphere(arena *a, point3 centre1, scalar r, material *mat) {
+  return make_sphere(a, centre1, centre1, r, mat);
+}

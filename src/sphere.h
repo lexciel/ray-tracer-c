@@ -14,4 +14,5 @@ int hit_sphere(const hittable *self, const ray *r, interval ray_t,
                hit_record *rec);
 sphere *make_sphere(arena *a, point3 centre1, point3 centre2, scalar r,
                     material *mat);
+sphere *make_static_sphere(arena *a, point3 centre1, scalar r, material *mat);
 #endif

@@ -43,13 +43,10 @@ vec3 sample_square(pcg32_random_t *rng);
 
 static inline ray get_ray(const camera *cam, point3 pixel_center,
                           pcg32_random_t *rng) {
-  // 1. Calculate random jitter (-0.5 to +0.5)
+
   double offset_x = random_double(rng) - 0.5;
   double offset_y = random_double(rng) - 0.5;
 
-  // 2. Nudge the center point
-  // We only multiply the offsets (small numbers), not the whole grid
-  // coordinates.
   point3 pixel_sample = {
       .x = pixel_center.x + (offset_x * cam->pixel_delta_x.x) +
            (offset_y * cam->pixel_delta_y.x),
@@ -61,7 +58,6 @@ static inline ray get_ray(const camera *cam, point3 pixel_center,
   point3 ray_origin =
       (cam->defocus_angle <= 0) ? cam->centre : defocus_disk_sample(cam, rng);
 
-  // 3. Direction = Sample - Origin
   vec3 ray_dir = {.x = pixel_sample.x - ray_origin.x,
                   .y = pixel_sample.y - ray_origin.y,
                   .z = pixel_sample.z - ray_origin.z};

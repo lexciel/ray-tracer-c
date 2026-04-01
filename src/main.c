@@ -120,8 +120,8 @@ int main() {
                                              (point3){4, 1, 0}, 1.0, mat3));
 
   scalar aspect_ratio = 16.0 / 9.0;
-  int samples_per_pixel = 100;
-  int image_width = 400;
+  int samples_per_pixel = 500;
+  int image_width = 2000;
   int max_depth = 50;
   scalar vfov = 20;
 

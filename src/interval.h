@@ -3,29 +3,32 @@
 #include "utility.h"
 
 typedef struct {
-    scalar min;
-    scalar max;
+  scalar min;
+  scalar max;
 } interval;
 
-static inline scalar size(interval i) {
-    return i.max - i.min;
-}
+static inline scalar size(interval i) { return i.max - i.min; }
 
 static inline int contains(interval i, double x) {
-        return i.min <= x && x <= i.max;
-    }
-
-static inline int surrounds(interval i, double x) {
-        return i.min < x && x < i.max;
-    }
-
-static inline interval empty_i() {
-    return (interval){infinity, - infinity};
+  return i.min <= x && x <= i.max;
 }
 
-static scalar clamp(interval i, scalar x)  {
-        if (x < i.min) return i.min;
-        if (x > i.max) return i.max;
-        return x;
-    }
+static inline int surrounds(interval i, double x) {
+  return i.min < x && x < i.max;
+}
+
+static inline interval empty_i() { return (interval){infinity, -infinity}; }
+
+static scalar clamp(interval i, scalar x) {
+  if (x < i.min)
+    return i.min;
+  if (x > i.max)
+    return i.max;
+  return x;
+}
+
+static interval expand(interval i, scalar delta) {
+  scalar padding = delta / 2;
+  return (interval){i.min - delta, i.max + delta};
+}
 #endif
