@@ -31,4 +31,9 @@ static interval expand(interval i, scalar delta) {
   scalar padding = delta / 2;
   return (interval){i.min - delta, i.max + delta};
 }
+
+static interval enclose_interval(interval a, interval b) {
+  return (interval){.min = a.min <= b.min ? a.min : b.min,
+                    .max = a.max >= b.max ? a.max : b.max};
+}
 #endif

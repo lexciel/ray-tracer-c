@@ -4,18 +4,14 @@
 #include "interval.h"
 #include "ray.h"
 
-typedef struct {
-  interval x, y, z;
+typedef union {
+  interval box[3];
+  struct {
+    interval x, y, z;
+  };
 } aabb;
 
-aabb *init_aabb(point3 a, point3 b, aabb *box) {
-  box->x = (a.v[0] <= b.v[0]) ? (interval){a.v[0], b.v[0]}
-                              : (interval){b.v[0], a.v[0]};
-  box->y = (a.v[1] <= b.v[1]) ? (interval){a.v[1], b.v[1]}
-                              : (interval){b.v[1], a.v[1]};
-  box->z = (a.v[2] <= b.v[2]) ? (interval){a.v[2], b.v[2]}
-                              : (interval){b.v[2], a.v[2]};
-  return box;
-}
-
+void init_aabb(point3 a, point3 b, aabb *box);
+int bb_hit(aabb *bb, const ray *r, interval ray_t);
+aabb enclose_aabb(aabb *box1, aabb *box2);
 #endif

@@ -1,6 +1,7 @@
 #ifndef SPHERE_H
 #define SPHERE_H
 
+#include "aabb.h"
 #include "hittable.h"
 
 typedef struct {
@@ -8,6 +9,7 @@ typedef struct {
   ray centre;
   scalar rad; // fmax(0, rad_input) when not using constructor
   material *mat;
+  aabb bbox;
 } sphere;
 extern const point3 static_sphere;
 int hit_sphere(const hittable *self, const ray *r, interval ray_t,
