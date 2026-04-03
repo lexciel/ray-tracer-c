@@ -112,7 +112,7 @@ int main() {
   material *mat2 =
       (material *)make_lambertian(&world_mem, (colour){0.4, 0.2, 0.1});
   hitlist_add(world, (hittable *)make_sphere(&world_mem, (point3){-4, 1, 0},
-                                             (point3){-4, -1, 0}, 1.0, mat2));
+                                             (point3){-4, 1, 0}, 1.0, mat2));
 
   material *mat3 =
       (material *)make_metal(&world_mem, (colour){0.7, 0.6, 0.5}, 0.0);
