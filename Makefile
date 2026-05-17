@@ -5,7 +5,7 @@ SRC_DIR = src
 
 SRCS = $(wildcard $(SRC_DIR)/*.c)
 
-CFLAGS = -O3 -march=native -ffast-math -flto -Werror -I$(SRC_DIR) -lm 
+CFLAGS = -O3 -march=native -ffast-math -g -flto -Werror -I$(SRC_DIR) -lm -fno-omit-frame-pointer
 LDFLAGS = -flto
 
 UNAME_S := $(shell uname -s)

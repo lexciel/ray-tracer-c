@@ -1,4 +1,5 @@
 #include "arena.h"
+#include "bvh.h"
 #include "camera.h"
 #include "colour.h"
 #include "hittable.h"
@@ -119,6 +120,9 @@ int main() {
   hitlist_add(world, (hittable *)make_sphere(&world_mem, (point3){4, 1, 0},
                                              (point3){4, 1, 0}, 1.0, mat3));
 
+  bvh_node *root = make_bvh_hlist(world, &world_mem);
+  world->objects[0] = (hittable *)root;
+  world->count = 1;
   scalar aspect_ratio = 16.0 / 9.0;
   int samples_per_pixel = 500;
   int image_width = 2000;

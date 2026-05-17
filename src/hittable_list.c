@@ -1,10 +1,12 @@
 #include "hittable_list.h"
+#include "aabb.h"
 
 #include <stdlib.h>
 
 int hitlist_add(hittable_list *list, hittable *object) {
   if (list->count < list->capacity) {
     list->objects[list->count++] = object;
+    list->bbox = enclose_aabb(list->bbox, object->bb(object));
     return 1;
   }
   return 0;

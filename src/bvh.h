@@ -4,6 +4,8 @@
 #include "aabb.h"
 #include "hittable.h"
 #include "hittable_list.h"
+#include "interval.h"
+#include <sys/types.h>
 
 typedef struct {
   hittable hit;
@@ -12,20 +14,19 @@ typedef struct {
   aabb bbox;
 } bvh_node;
 
-int hit_bvh(struct hittable *self, const ray *r, interval ray_t,
-            hit_record *rec) {
-  bvh_node *node = (bvh_node *)self;
-  if (!bb_hit(&node->bbox, r, ray_t)) {
-    return 0;
-  }
+typedef int (*hittable_cmp)(const void *, const void *);
 
-  int hit_left = node->left->hit(node->left, r, ray_t, rec);
-  int hit_right = node->right->hit(node->right, r, ray_t, rec);
+int hit_bvh(const struct hittable *self, const ray *r, interval ray_t,
+            hit_record *rec);
 
-  return hit_left || hit_right;
-}
+static int box_compare(const void *a, const void *b, u_int32_t axis);
+static int box_x_compare(const void *a, const void *b);
+static int box_y_compare(const void *a, const void *b);
+static int box_z_compare(const void *a, const void *b);
 
-aabb bounding_box_bvh(hittable *self) { return ((bvh_node *)self)->bbox; }
-bvh_node *make_bvh_hlist(hittable_list *list);
-bvh_node *init_bvh_node(hittable *objects, size_t start, size_t end);
+aabb bounding_box_bvh(hittable *self);
+bvh_node *make_bvh_hlist(hittable_list *list, arena *arena);
+bvh_node *init_bvh_node(bvh_node *node, hittable **objects, size_t start,
+                        size_t end, arena *arena);
+
 #endif

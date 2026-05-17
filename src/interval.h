@@ -7,7 +7,10 @@ typedef struct {
   scalar max;
 } interval;
 
-static inline scalar size(interval i) { return i.max - i.min; }
+extern const interval interval_empty;
+extern const interval interval_universe;
+
+static inline scalar interval_size(interval i) { return i.max - i.min; }
 
 static inline int contains(interval i, double x) {
   return i.min <= x && x <= i.max;

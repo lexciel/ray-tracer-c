@@ -21,6 +21,7 @@ typedef aabb (*bounding_box)(struct hittable *self);
 typedef struct hittable {
   hit_f hit;
   bounding_box bb;
+  aabb bbox;
 } hittable;
 
 void set_face_normal(hit_record *self, const ray *r,

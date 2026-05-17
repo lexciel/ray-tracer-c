@@ -41,7 +41,7 @@ int hit_sphere(const hittable *self, const ray *r, interval ray_t,
   return 1;
 }
 
-aabb bounding_box_sphere(hittable *self) { return ((sphere *)self)->bbox; }
+aabb bounding_box_sphere(hittable *self) { return ((sphere *)self)->base.bbox; }
 
 sphere *make_sphere(arena *a, point3 c1, point3 c2, scalar r, material *mat) {
   sphere *s = arena_alloc(a, sizeof(sphere));
@@ -57,13 +57,13 @@ sphere *make_sphere(arena *a, point3 c1, point3 c2, scalar r, material *mat) {
             vec3_add(ray_at(0, &(s->centre)), rvec), &box1);
   init_aabb(vec3_sub(ray_at(1, &(s->centre)), rvec),
             vec3_add(ray_at(1, &(s->centre)), rvec), &box2);
-  s->bbox = enclose_aabb(&box1, &box2);
+  s->base.bbox = enclose_aabb(box1, box2);
   return s;
 }
 
 sphere *make_static_sphere(arena *a, point3 centre1, scalar r, material *mat) {
   sphere *s = make_sphere(a, centre1, centre1, r, mat);
   vec3 rvec = (vec3){s->rad, s->rad, s->rad};
-  init_aabb(vec3_sub(centre1, rvec), vec3_add(centre1, rvec), &(s->bbox));
+  init_aabb(vec3_sub(centre1, rvec), vec3_add(centre1, rvec), &(s->base.bbox));
   return s;
 }

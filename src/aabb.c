@@ -1,6 +1,17 @@
 #include "aabb.h"
 #include "interval.h"
 
+const aabb aabb_empty = {
+    .x = {.min = INFINITY, .max = -INFINITY},
+    .y = {.min = INFINITY, .max = -INFINITY},
+    .z = {.min = INFINITY, .max = -INFINITY},
+};
+const aabb aabb_universe = {
+    .x = {.min = -INFINITY, .max = INFINITY},
+    .y = {.min = -INFINITY, .max = INFINITY},
+    .z = {.min = -INFINITY, .max = INFINITY},
+};
+
 void init_aabb(point3 a, point3 b, aabb *box) {
   box->x = (a.v[0] <= b.v[0]) ? (interval){a.v[0], b.v[0]}
                               : (interval){b.v[0], a.v[0]};
@@ -35,12 +46,19 @@ int bb_hit(aabb *bb, const ray *r, interval ray_t) {
     if (ray_t.max <= ray_t.min) {
       return 0;
     }
-    return 1;
   }
+  return 1;
 }
 
-aabb enclose_aabb(aabb *box0, aabb *box1) {
-  return (aabb){.x = enclose_interval(box0->x, box1->x),
-                .y = enclose_interval(box0->y, box1->y),
-                .z = enclose_interval(box0->z, box1->z)};
+aabb enclose_aabb(aabb box0, aabb box1) {
+  return (aabb){.x = enclose_interval(box0.x, box1.x),
+                .y = enclose_interval(box0.y, box1.y),
+                .z = enclose_interval(box0.z, box1.z)};
+}
+
+int longest_axis(aabb box) {
+  if (interval_size(box.x) > interval_size(box.y))
+    return interval_size(box.x) > interval_size(box.z) ? 0 : 2;
+  else
+    return interval_size(box.y) > interval_size(box.z) ? 1 : 2;
 }
